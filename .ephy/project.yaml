@@ -1,0 +1,20 @@
+schema_version: 1
+
+project:
+  id: "ephy-cam"
+  family: "ephy"
+  type: "extension"
+  status: "design"
+  visibility: "public"
+  description: "Camera and visual-ingestion interfaces for Ephy and Karte"
+
+relations:
+  parent: "ephy"
+  depends_on: []
+  integrates_with: ["ephy-runtime", "karte"]
+  runs_on: []
+
+data_policy:
+  classification: "restricted"
+  personal_data_in_git: "prohibited"
+  secrets_in_git: "prohibited"

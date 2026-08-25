@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "capture_id": "00000000-0000-4000-8000-000000000001",
+  "source_id": "synthetic-camera",
+  "media_type": "image/png",
+  "captured_at": "2026-01-01T00:00:00Z",
+  "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "size_bytes": 128,
+  "staging_reference": "staging://synthetic/capture-0001.png"
+}

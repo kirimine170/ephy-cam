@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MediaEnvelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "capture_id",
+    "source_id",
+    "media_type",
+    "captured_at",
+    "sha256",
+    "size_bytes",
+    "staging_reference"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "capture_id": {"type": "string", "format": "uuid"},
+    "source_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "media_type": {"type": "string", "pattern": "^(image|video)/[a-z0-9.+-]+$"},
+    "captured_at": {"type": "string", "format": "date-time"},
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "size_bytes": {"type": "integer", "minimum": 0},
+    "staging_reference": {
+      "type": "string",
+      "pattern": "^staging://[A-Za-z0-9._/-]+$"
+    }
+  }
+}
