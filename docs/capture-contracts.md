@@ -11,8 +11,15 @@ path，scheduler，or network service．
 The contracts follow the responsibility boundaries in the Ephy camera-context
 design and ADRs．The JSON schemas provide structural validation．
 `src/ephy_cam/contracts.py` provides chronological and other cross-field checks
-that JSON Schema cannot express，and `src/ephy_cam/capture_gate.py` enforces the
-resolved permit at the gateway boundary．
+that JSON Schema cannot express．Every public domain validator applies the full
+schema before those checks，and `src/ephy_cam/capture_gate.py` enforces the
+resolved permit at the gateway boundary．Callers cannot bypass structural
+validation by invoking the domain API directly．
+
+The domain validator's pinned runtime dependency is declared in
+`requirements-contracts.txt`．Linux hosts may satisfy the same dependency with
+the distribution-provided `python3-jsonschema` package documented by
+`ephy-physical-ci`．
 
 ## `CaptureSource`
 
