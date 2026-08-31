@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PhotoAcceptance v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "capture_id",
+    "decision",
+    "decided_at",
+    "decided_by",
+    "trace_id"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "capture_id": {"type": "string", "format": "uuid"},
+    "decision": {"enum": ["accepted", "rejected"]},
+    "decided_at": {"type": "string", "format": "date-time"},
+    "decided_by": {"enum": ["user", "policy"]},
+    "policy_revision": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+    },
+    "trace_id": {"type": "string", "format": "uuid"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"decided_by": {"const": "policy"}},
+        "required": ["decided_by"]
+      },
+      "then": {"required": ["policy_revision"]}
+    }
+  ]
+}

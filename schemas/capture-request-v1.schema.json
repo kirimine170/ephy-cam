@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CaptureRequest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "request_id",
+    "source_id",
+    "purpose",
+    "requested_at",
+    "deadline",
+    "capture_profile",
+    "retention_intent",
+    "permit_token",
+    "trace_id"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "request_id": {"type": "string", "format": "uuid"},
+    "source_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "purpose": {
+      "enum": [
+        "ephy-input",
+        "karte-record",
+        "ambient-observation",
+        "physical-ci-test"
+      ]
+    },
+    "requested_at": {"type": "string", "format": "date-time"},
+    "deadline": {"type": "string", "format": "date-time"},
+    "capture_profile": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "retention_intent": {"enum": ["ephemeral", "candidate"]},
+    "permit_token": {"type": "string", "minLength": 16, "maxLength": 4096},
+    "trace_id": {"type": "string", "format": "uuid"}
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CapturePermit v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "permit_id",
+    "source_id",
+    "allowed_purposes",
+    "issued_at",
+    "expires_at",
+    "place_assertion_id",
+    "max_captures",
+    "minimum_cooldown_seconds",
+    "indicator_required",
+    "policy_revision"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "permit_id": {"type": "string", "format": "uuid"},
+    "source_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "allowed_purposes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "ephy-input",
+          "karte-record",
+          "ambient-observation",
+          "physical-ci-test"
+        ]
+      }
+    },
+    "issued_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "place_assertion_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+    },
+    "max_captures": {"type": "integer", "minimum": 1, "maximum": 1000},
+    "minimum_cooldown_seconds": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 86400
+    },
+    "indicator_required": {"const": true},
+    "policy_revision": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+    }
+  }
+}

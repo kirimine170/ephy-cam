@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "request_id": "00000000-0000-4000-8000-000000000101",
+  "source_id": "synthetic-camera",
+  "purpose": "ambient-observation",
+  "requested_at": "2026-01-01T00:00:10Z",
+  "deadline": "2026-01-01T00:01:00Z",
+  "capture_profile": "synthetic-vga",
+  "retention_intent": "ephemeral",
+  "permit_token": "synthetic-permit-token-0001",
+  "trace_id": "00000000-0000-4000-8000-000000000102"
+}
