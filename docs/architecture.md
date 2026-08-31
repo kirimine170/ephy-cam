@@ -2,22 +2,37 @@
 
 ## Purpose
 
-This document describes the stable responsibility boundaries of the repository．Project-specific implementations should extend it with components，interfaces，data flows，failure modes，and deployment boundaries．
+This repository owns camera-device adapters，capture contracts，and staged media
+metadata for the Ephy ecosystem．
 
 ## Repository layers
 
-- `.ephy/` contains the machine-readable project identity，direct repository relationships，and data policy．
-- `docs/` contains architecture，relationship，security，and decision records．
-- `.github/` contains repository-local collaboration and validation configuration．
-- `scripts/` contains stack-independent repository initialization and validation．
-- `tests/` verifies the repository tooling without modifying the source checkout．
+- `.ephy/` contains project identity，relationships，and data policy．
+- `schemas/` contains `CaptureSource` and `MediaEnvelope` contracts．
+- `reference/` contains device-owned reference implementations．
+- `docs/` describes architecture，security，and long-lived decisions．
+- `scripts/` and `tests/` validate repository and implementation invariants．
+
+## XIAO ESP32S3 Sense reference
+
+The device firmware owns camera pins，OV3660 sensor settings，resolution
+switching，and USB framing．The host reference owns JPEG validation，temporary
+staging，contract generation，and a bounded loopback preview．
+
+The preview path requests individual VGA frames and retains only the newest
+frame in memory．An explicit capture request switches the sensor to QXGA，
+reapplies the fixed manual exposure，warms the sensor，returns one JPEG，and
+returns to VGA．
 
 ## Responsibility boundaries
 
-Each Ephy repository owns a defined project responsibility．Cross-repository relationships must be explicit in `.ephy/project.yaml`，but downstream consumers are discovered centrally by the future `ephy` meta repository rather than copied into every repository．Git submodules are not an architecture model for Ephy relationships．
-
-Implementation-specific source trees，package managers，build systems，and runtime architecture are intentionally absent from this base template．Add them only after the generated repository has selected its technology and responsibility boundaries．
+`ephy-physical-ci` may provision host packages and invoke generic build，flash，
+and artifact-validation commands．It must not own camera pins，sensor profiles，
+or device protocol implementation．`ephy-runtime` and Karte remain outside the
+automatic path for this reference．
 
 ## Implementation state and proposals
 
-Document current behavior as implementation state．Document unaccepted ideas as proposals，and use an ADR when a decision has lasting architectural impact．Do not infer delivery dates or completion percentages from the project status field．
+The XIAO reference and USB protocol are implemented and hardware validated．A
+daemon，scheduler，retention service，and automatic policy ingestion remain
+future proposals．

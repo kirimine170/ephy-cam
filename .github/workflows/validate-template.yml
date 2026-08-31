@@ -1,4 +1,4 @@
-name: Validate template
+name: Validate repository
 
 on:
   push:
@@ -19,8 +19,23 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install shell validator
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes shellcheck
+
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
 
       - name: Validate repository and scan template text
         run: python scripts/validate_repository.py --check-sensitive-patterns
+
+      - name: Check reference host Python syntax
+        run: >-
+          python -m py_compile
+          reference/xiao-esp32s3-sense/host/ephy_cam_reference.py
+
+      - name: Check reference shell scripts
+        run: |
+          shellcheck reference/xiao-esp32s3-sense/scripts/*.sh
+          bash -n reference/xiao-esp32s3-sense/scripts/*.sh

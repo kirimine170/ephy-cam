@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "device_profile": "xiao-esp32s3-sense",
+  "source_id": "xiao-esp32s3-sense-01",
+  "board": {
+    "fqbn": "esp32:esp32:XIAO_ESP32S3",
+    "options": {
+      "PSRAM": "opi"
+    },
+    "arduino_esp32_version": "3.3.11"
+  },
+  "camera": {
+    "expected_model": "OV3660",
+    "preview": {
+      "frame_size": "VGA",
+      "width": 640,
+      "height": 480,
+      "persistence": "memory-only"
+    },
+    "capture": {
+      "frame_size": "QXGA",
+      "width": 2048,
+      "height": 1536,
+      "media_type": "image/jpeg",
+      "trigger": "explicit-command-only"
+    },
+    "fixed_profile": {
+      "name": "f-fixed-r0551-g0400-b0844-ag8-ex1560",
+      "brightness": -1,
+      "contrast": 1,
+      "saturation": -1,
+      "sharpness": 0,
+      "denoise": 1,
+      "awb_red_gain": 1361,
+      "awb_green_gain": 1024,
+      "awb_blue_gain": 2116,
+      "agc_gain": 8,
+      "aec_value": 1560,
+      "capture_warmup_frames": 24,
+      "capture_jpeg_quality": 10,
+      "preview_jpeg_quality": 20
+    }
+  },
+  "transport": {
+    "type": "usb-cdc",
+    "protocol": "EPHYCAM/1",
+    "wifi": "disabled",
+    "microsd": "disabled"
+  },
+  "policy": {
+    "automatic_capture": "disabled",
+    "continuous_capture": "disabled",
+    "karte_write": "disabled",
+    "runtime_automatic_ingestion": "disabled",
+    "binary_media_in_envelope": "prohibited"
+  }
+}

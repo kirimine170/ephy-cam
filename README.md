@@ -2,66 +2,86 @@
 
 ## Overview
 
-Camera and visual-ingestion interfaces for Ephy and Karte
+Camera and visual-ingestion interfaces for Ephy and Karte．
 
 ## Role in the Ephy ecosystem
 
-This repository is an Ephy `extension` project．Its status is `design` and its intended visibility is `public`．Repository relationships are declared in `.ephy/project.yaml`．
+This repository is an Ephy `extension` project．Its status is `design` and its
+intended visibility is `public`．Repository relationships are declared in
+`.ephy/project.yaml`．
 
 ## Goals
 
-- Describe the outcomes this repository owns．
-- Keep responsibilities aligned with its declared Ephy project type．
+- Define capture-source and media-envelope contracts．
+- Provide privacy-preserving reference implementations for supported devices．
+- Keep device code separate from Physical CI host provisioning．
 
 ## Non-goals
 
-- Do not duplicate responsibilities owned by related repositories．
-- Do not maintain a downstream repository registry in this repository．
+- Do not store master images or production Karte content in Git．
+- Do not implement Physical CI scheduling or host configuration here．
+- Do not distribute `ephy-private` to capture devices．
 
 ## Current status
 
-The current implementation status is `design`．This label describes observed implementation state，not a delivery date or completion percentage．
+The current implementation status is `design`．A hardware-validated reference
+implementation for XIAO ESP32S3 Sense is available under
+[`reference/xiao-esp32s3-sense`](reference/xiao-esp32s3-sense/README.md)．It is
+a bounded reference and not yet a production capture service．
 
 ## Architecture
 
-The current design defines `CaptureSource`，`MediaEnvelope`，and a policy-controlled staging boundary．No concrete device driver is implemented．See [capture and ingestion contracts](docs/capture-contracts.md) and the JSON schemas under `schemas/`．
+The repository defines `CaptureSource`，`MediaEnvelope`，and a
+policy-controlled staging boundary．The reference device provides USB CDC VGA
+preview and explicit QXGA one-shot capture．See
+[capture and ingestion contracts](docs/capture-contracts.md) and the JSON
+schemas under `schemas/`．
 
 ## Repository relationships
 
 - Parent project: `ephy`
-- Direct dependencies:
-  - None declared．
-- Integration peers:
-  - `ephy-runtime`
-  - `karte`
-- Runtime platforms:
-  - None declared．
+- Direct dependencies: none declared．
+- Integration peers: `ephy-runtime` and `karte`．
+- Runtime platforms: none declared．
 
-Declare only the parent and direct relationships．Do not list downstream consumers，and do not use Git submodules to represent ecosystem relationships．See [docs/repository-relations.md](docs/repository-relations.md)．
+Declare only parent and direct relationships．Do not use Git submodules as an
+ecosystem relationship model．See
+[docs/repository-relations.md](docs/repository-relations.md)．
 
 ## Getting started
 
-Add project-specific setup instructions here after selecting the implementation stack．
+The reference device requires Linux，Arduino-ESP32 `3.3.11`，and the host
+packages documented by `ephy-physical-ci`．Use a Git-ignored staging directory
+for every real capture．
 
 ## Testing
 
-Document project-specific test commands here．Keep the repository metadata validation in the standard verification path:
-
 ```bash
-python3 scripts/validate_repository.py
+python3 -m unittest discover -s tests -v
+python3 scripts/validate_repository.py --check-sensitive-patterns
+python3 -m py_compile \
+  reference/xiao-esp32s3-sense/host/ephy_cam_reference.py
 ```
+
+Firmware compilation is performed on a Linux host with the pinned Arduino core
+using the reference build script．
 
 ## Security and data handling
 
-The data classification is `restricted`．Do not commit secrets，unnecessary personal data，raw conversation history，production Karte data，master camera images，raw LoRA training data，or model weights．See [docs/security-and-data.md](docs/security-and-data.md)．
+The data classification is `restricted`．Do not commit secrets，unnecessary
+personal data，raw conversation history，production Karte data，master camera
+images，raw training data，or model weights．See
+[docs/security-and-data.md](docs/security-and-data.md)．
 
 ## Documentation
 
 - [Architecture](docs/architecture.md)
+- [Capture contracts](docs/capture-contracts.md)
 - [Repository relationships](docs/repository-relations.md)
 - [Security and data handling](docs/security-and-data.md)
 - [Architecture Decision Records](docs/adr/README.md)
 
 ## License
 
-No license has been selected automatically．Determine the repository's visibility and license explicitly before distribution，then add the appropriate license file and update this section．
+No license has been selected．Determine visibility and licensing explicitly
+before distribution，then add the license file and update this section．
