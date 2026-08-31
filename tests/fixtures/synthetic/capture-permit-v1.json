@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "permit_id": "00000000-0000-4000-8000-000000000201",
+  "source_id": "synthetic-camera",
+  "allowed_purposes": ["ambient-observation", "ephy-input"],
+  "issued_at": "2026-01-01T00:00:00Z",
+  "expires_at": "2026-01-01T00:05:00Z",
+  "place_assertion_id": "synthetic-place-assertion",
+  "max_captures": 2,
+  "minimum_cooldown_seconds": 30,
+  "indicator_required": true,
+  "policy_revision": "synthetic-policy-r1"
+}

@@ -16,6 +16,18 @@ Private repository visibility is not a secret-management control．Do not store 
 
 Use an approved secret manager for credentials and access-controlled data or artifact storage for large，sensitive，or operational data．Commit only synthetic or properly anonymized fixtures that are necessary for tests．Before committing，review staged changes and run the repository validation．
 
+## Camera authorization data
+
+`CaptureRequest.permit_token` is opaque authorization material．Do not print it，
+persist it in ordinary logs，or include a real token in a fixture．Only the
+component that authenticates the token may resolve it to a `CapturePermit`．
+
+Media envelopes contain a staging reference，never image bytes．The v2 contract
+is deliberately closed and excludes precise coordinates，SSID/BSSID，captions，
+identity or emotion inference，and other contextual data that is not required
+to validate the capture pipeline．Real images remain in access-controlled，
+expiring staging outside Git．
+
 ## Metadata policy
 
 `.ephy/project.yaml` declares a data classification of `public`，`internal`，`confidential`，or `restricted`．It must also set both `personal_data_in_git` and `secrets_in_git` to `prohibited`．Classification describes handling sensitivity; it never permits secrets or unnecessary personal data in Git．

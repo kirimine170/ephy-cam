@@ -24,16 +24,19 @@ intended visibility is `public`．Repository relationships are declared in
 
 ## Current status
 
-The current implementation status is `design`．A hardware-validated reference
-implementation for XIAO ESP32S3 Sense is available under
+The current implementation status is `design`．Versioned camera authorization
+contracts and a fail-closed media lifecycle domain are implemented under
+`schemas/` and `src/ephy_cam/`．A hardware-validated reference implementation
+for XIAO ESP32S3 Sense is available under
 [`reference/xiao-esp32s3-sense`](reference/xiao-esp32s3-sense/README.md)．It is
 a bounded reference and not yet a production capture service．
 
 ## Architecture
 
-The repository defines `CaptureSource`，`MediaEnvelope`，and a
-policy-controlled staging boundary．The reference device provides USB CDC VGA
-preview and explicit QXGA one-shot capture．See
+The repository defines `CaptureSource`，`CaptureRequest`，`CapturePermit`，
+`MediaEnvelope`，`PhotoAcceptance`，and a policy-controlled staging boundary．
+The reference device provides USB CDC VGA preview and explicit QXGA one-shot
+capture．See
 [capture and ingestion contracts](docs/capture-contracts.md) and the JSON
 schemas under `schemas/`．
 
@@ -57,9 +60,11 @@ for every real capture．
 ## Testing
 
 ```bash
+python3 -m pip install -r requirements-test.txt
 python3 -m unittest discover -s tests -v
 python3 scripts/validate_repository.py --check-sensitive-patterns
 python3 -m py_compile \
+  src/ephy_cam/*.py \
   reference/xiao-esp32s3-sense/host/ephy_cam_reference.py
 ```
 

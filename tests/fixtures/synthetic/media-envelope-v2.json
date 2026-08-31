@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "capture_id": "00000000-0000-4000-8000-000000000301",
+  "source_id": "synthetic-camera",
+  "media_type": "image/jpeg",
+  "captured_at": "2026-01-01T00:00:20Z",
+  "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "size_bytes": 256,
+  "staging_reference": "staging://synthetic/capture-0301.jpg",
+  "purpose": "ambient-observation",
+  "retention_class": "ephemeral",
+  "expires_at": "2026-01-01T00:10:20Z",
+  "width": 640,
+  "height": 480,
+  "clock_source": "gateway-utc",
+  "firmware_version": "synthetic-1.0.0",
+  "sensor_model": "SYNTHETIC-CAMERA",
+  "trace_id": "00000000-0000-4000-8000-000000000302"
+}

@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MediaEnvelope v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "capture_id",
+    "source_id",
+    "media_type",
+    "captured_at",
+    "sha256",
+    "size_bytes",
+    "staging_reference",
+    "purpose",
+    "retention_class",
+    "expires_at",
+    "width",
+    "height",
+    "clock_source",
+    "firmware_version",
+    "sensor_model",
+    "trace_id"
+  ],
+  "properties": {
+    "schema_version": {"const": 2},
+    "capture_id": {"type": "string", "format": "uuid"},
+    "source_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "media_type": {"const": "image/jpeg"},
+    "captured_at": {"type": "string", "format": "date-time"},
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "size_bytes": {"type": "integer", "minimum": 1},
+    "staging_reference": {
+      "type": "string",
+      "pattern": "^staging://[A-Za-z0-9._/-]+$"
+    },
+    "purpose": {
+      "enum": [
+        "ephy-input",
+        "karte-record",
+        "ambient-observation",
+        "physical-ci-test"
+      ]
+    },
+    "retention_class": {
+      "enum": ["ephemeral", "candidate", "accepted"]
+    },
+    "expires_at": {"type": "string", "format": "date-time"},
+    "width": {"type": "integer", "minimum": 1, "maximum": 65535},
+    "height": {"type": "integer", "minimum": 1, "maximum": 65535},
+    "clock_source": {
+      "enum": ["gateway-utc", "runtime-utc", "device-calibrated-utc"]
+    },
+    "firmware_version": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$"
+    },
+    "sensor_model": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$"
+    },
+    "trace_id": {"type": "string", "format": "uuid"}
+  }
+}
