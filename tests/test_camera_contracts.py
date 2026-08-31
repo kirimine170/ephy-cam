@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 import sys
+from types import MappingProxyType
 import unittest
 
 from jsonschema import Draft202012Validator, FormatChecker
@@ -162,6 +163,16 @@ class CaptureAuthorizationTests(unittest.TestCase):
         permit = deepcopy(self.permit)
         permit["allowed_purposes"] = "ambient-observation"
         self.assert_denied("invalid_capture_permit_schema", permit=permit)
+
+    def test_read_only_mapping_inputs_are_supported(self) -> None:
+        ledger = CaptureAuthorizationLedger()
+        ledger.authorize_and_record(
+            MappingProxyType(self.request),
+            MappingProxyType(self.permit),
+            now=self.now,
+            indicator_ready=True,
+        )
+        self.assertEqual(ledger.capture_count(str(self.permit["permit_id"])), 1)
 
     def test_deadline_is_fail_closed(self) -> None:
         self.assert_denied(
@@ -332,6 +343,17 @@ class MediaLifecycleTests(unittest.TestCase):
                 ):
                     lifecycle.apply_acceptance(acceptance)
                 self.assertEqual(lifecycle.state, LifecycleState.CANDIDATE)
+
+    def test_read_only_acceptance_mapping_is_supported(self) -> None:
+        lifecycle = self.lifecycle()
+        lifecycle.mark_candidate(
+            occurred_at=self.captured_at + timedelta(seconds=1)
+        )
+        acceptance = MappingProxyType(
+            load_json(FIXTURES / "photo-acceptance-v1.json")
+        )
+        lifecycle.apply_acceptance(acceptance)
+        self.assertEqual(lifecycle.state, LifecycleState.ACCEPTED)
 
     def test_purged_is_terminal(self) -> None:
         lifecycle = self.lifecycle()

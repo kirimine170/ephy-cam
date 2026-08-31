@@ -39,7 +39,7 @@ def validate_structure(
     violation_code: str,
 ) -> None:
     try:
-        contract_validator(schema_name).validate(document)
+        contract_validator(schema_name).validate(dict(document))
     except ValidationError as exc:
         raise ContractViolation(violation_code) from exc
 
