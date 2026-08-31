@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 import sys
+from types import MappingProxyType
 import unittest
 
 from jsonschema import Draft202012Validator, FormatChecker
@@ -84,7 +85,9 @@ class CameraContractSchemaTests(unittest.TestCase):
         request["retention_intent"] = "accepted"
         with self.assertRaises(ValidationError):
             Draft202012Validator(schema).validate(request)
-        with self.assertRaisesRegex(ContractViolation, "capture_cannot_accept_media"):
+        with self.assertRaisesRegex(
+            ContractViolation, "invalid_capture_request_schema"
+        ):
             validate_capture_request(request)
 
     def test_automatic_permit_requires_indicator(self) -> None:
@@ -141,6 +144,31 @@ class CaptureAuthorizationTests(unittest.TestCase):
         ledger.authorize_and_record(
             self.request,
             self.permit,
+            now=self.now,
+            indicator_ready=True,
+        )
+        self.assertEqual(ledger.capture_count(str(self.permit["permit_id"])), 1)
+
+    def test_missing_request_identity_is_rejected(self) -> None:
+        request = deepcopy(self.request)
+        del request["request_id"]
+        self.assert_denied("invalid_capture_request_schema", request=request)
+
+    def test_missing_permit_identity_is_rejected(self) -> None:
+        permit = deepcopy(self.permit)
+        del permit["permit_id"]
+        self.assert_denied("invalid_capture_permit_schema", permit=permit)
+
+    def test_non_array_allowed_purposes_is_rejected(self) -> None:
+        permit = deepcopy(self.permit)
+        permit["allowed_purposes"] = "ambient-observation"
+        self.assert_denied("invalid_capture_permit_schema", permit=permit)
+
+    def test_read_only_mapping_inputs_are_supported(self) -> None:
+        ledger = CaptureAuthorizationLedger()
+        ledger.authorize_and_record(
+            MappingProxyType(self.request),
+            MappingProxyType(self.permit),
             now=self.now,
             indicator_ready=True,
         )
@@ -297,6 +325,35 @@ class MediaLifecycleTests(unittest.TestCase):
         acceptance["trace_id"] = "00000000-0000-4000-8000-000000000399"
         with self.assertRaisesRegex(TransitionDenied, "acceptance_trace_mismatch"):
             lifecycle.apply_acceptance(acceptance)
+
+    def test_acceptance_requires_a_valid_actor(self) -> None:
+        for actor in (None, "untrusted-actor"):
+            with self.subTest(actor=actor):
+                lifecycle = self.lifecycle()
+                lifecycle.mark_candidate(
+                    occurred_at=self.captured_at + timedelta(seconds=1)
+                )
+                acceptance = load_json(FIXTURES / "photo-acceptance-v1.json")
+                if actor is None:
+                    del acceptance["decided_by"]
+                else:
+                    acceptance["decided_by"] = actor
+                with self.assertRaisesRegex(
+                    ContractViolation, "invalid_photo_acceptance_schema"
+                ):
+                    lifecycle.apply_acceptance(acceptance)
+                self.assertEqual(lifecycle.state, LifecycleState.CANDIDATE)
+
+    def test_read_only_acceptance_mapping_is_supported(self) -> None:
+        lifecycle = self.lifecycle()
+        lifecycle.mark_candidate(
+            occurred_at=self.captured_at + timedelta(seconds=1)
+        )
+        acceptance = MappingProxyType(
+            load_json(FIXTURES / "photo-acceptance-v1.json")
+        )
+        lifecycle.apply_acceptance(acceptance)
+        self.assertEqual(lifecycle.state, LifecycleState.ACCEPTED)
 
     def test_purged_is_terminal(self) -> None:
         lifecycle = self.lifecycle()
