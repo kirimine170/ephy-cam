@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import errno
 import json
 import os
 from pathlib import Path
@@ -162,6 +163,8 @@ class InspectionBundleTests(unittest.TestCase):
         path = root / "capture-manifest.json"
         original = strict_json(path.read_bytes())
         for alter in (lambda m: m.update(extra="x"), lambda m: m.update(schema_version=2),
+                      lambda m: m.update(envelope_version=1.0),
+                      lambda m: m["bindings"]["image"].update(size_bytes=float(m["bindings"]["image"]["size_bytes"])),
                       lambda m: m["capture_time"].update(meaning="envelope_declared_time_unverified"),
                       lambda m: m["bindings"]["image"].update(path="../source/capture.jpg"),
                       lambda m: m["bindings"]["image"].update(path="session.json")):
@@ -266,6 +269,20 @@ class InspectionBundleTests(unittest.TestCase):
         self.assertEqual((self.root / "bundle/race-owner").read_bytes(), b"preserve")
         self.assertEqual(list(self.root.glob(".inspection-*")), [])
 
+    def test_stage_creation_errors_are_private_reason_codes_without_output(self):
+        from io import StringIO
+        identity_args = [item for key, value in self.expected.items() for item in ("--expect-" + key.replace("_", "-"), value)]
+        args = ["--session", str(self.session_path), "--capture-dir", str(self.capture), "--output", str(self.root / "bundle"), *identity_args]
+        for code in (errno.ENOSPC, errno.EACCES):
+            with self.subTest(code=code), patch("ephy_cam.inspection_bundle.tempfile.mkdtemp", side_effect=OSError(code, "synthetic failure", "private-output-parent")):
+                stderr = StringIO()
+                with patch("sys.stderr", stderr):
+                    self.assertEqual(main(args), 2)
+                self.assertEqual(json.loads(stderr.getvalue()), {"execution_status": "error", "reason": "publication_failed"})
+                self.assertNotIn("private-output-parent", stderr.getvalue())
+                self.assertFalse((self.root / "bundle").exists())
+                self.assertEqual(list(self.root.glob(".inspection-*")), [])
+
     def test_atomic_publish_never_replaces_existing_directory(self):
         from ephy_cam.inspection_bundle import _publish
         stage, output = self.root / "stage", self.root / "destination"
@@ -335,6 +352,11 @@ class InspectionBundleTests(unittest.TestCase):
         with self.assertRaises(BundleError):
             self.build("invalid")
         del self.envelope["sample_id"]
+        self.envelope["width"] = 2048.0
+        self.write_inputs()
+        with self.assertRaisesRegex(BundleError, "integer_dimensions_required"):
+            self.build("bad-dimensions")
+        self.envelope["width"] = 2048
         self.envelope["retention_class"] = "accepted"
         self.write_inputs()
         with self.assertRaisesRegex(BundleError, "accepted_media_out_of_scope"):

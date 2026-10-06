@@ -181,6 +181,8 @@ def _validate_source(session, image, envelope_raw, validation_raw):
         raise BundleError("unsupported_envelope_version")
     _structure(envelope, "media-envelope.schema.json" if version == 1 else "media-envelope-v2.schema.json")
     if version == 2:
+        if any(type(envelope[field]) is not int for field in ("width", "height")):
+            raise BundleError("integer_dimensions_required")
         try:
             validate_media_envelope_v2(envelope)
         except ContractViolation as exc:
@@ -257,8 +259,12 @@ def replay_bundle(bundle_dir: Path, *, expected_identity: Mapping[str, Any],
         raise BundleError("manifest_digest_mismatch")
     manifest = strict_json(manifest_raw)
     _structure(manifest, "capture-manifest-v1.schema.json")
+    if type(manifest["envelope_version"]) is not int:
+        raise BundleError("integer_envelope_version_required")
     snapshots = {}
     for key, binding in manifest["bindings"].items():
+        if type(binding["size_bytes"]) is not int:
+            raise BundleError("integer_binding_size_required")
         path = relative_path(binding["path"])
         raw = read_regular(root / path, MAX_IMAGE_BYTES if key == "image" else MAX_JSON_BYTES)
         if digest(raw) != binding["sha256"] or len(raw) != binding["size_bytes"]:
@@ -325,8 +331,9 @@ def create_bundle(session_path: Path, capture_dir: Path, output_dir: Path, *,
     _structure(manifest, "capture-manifest-v1.schema.json")
     manifest_raw = canonical(manifest)
     report = _report(manifest, manifest_raw)
-    stage = Path(tempfile.mkdtemp(prefix=".inspection-", dir=parent))
+    stage = None
     try:
+        stage = Path(tempfile.mkdtemp(prefix=".inspection-", dir=parent))
         for key, raw in snapshots.items():
             path = stage / manifest["bindings"][key]["path"]
             path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -341,6 +348,9 @@ def create_bundle(session_path: Path, capture_dir: Path, output_dir: Path, *,
         raise BundleError("output_already_exists" if os.path.lexists(output) else "publication_failed") from exc
     finally:
         # Only the uniquely owned stage is removed, never the requested output.
-        if stage.exists():
-            shutil.rmtree(stage)
+        if stage is not None and stage.exists():
+            try:
+                shutil.rmtree(stage)
+            except OSError as exc:
+                raise BundleError("stage_cleanup_failed") from exc
     return report
