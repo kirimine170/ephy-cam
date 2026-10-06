@@ -59,6 +59,12 @@ for every real capture．
 
 ## Testing
 
+Offline observation bundles can now bind an existing capture to an independent
+inspection session and replay its byte evidence．See
+[offline inspection capture v1](docs/inspection-capture-v1.md) for the CLI，
+identity checks，storage bounds and Physical CI evidence references．This step
+does not perform physical validation or generate measurements．
+
 ```bash
 python3 -m pip install -r requirements-test.txt
 python3 -m unittest discover -s tests -v
@@ -82,6 +88,7 @@ images，raw training data，or model weights．See
 
 - [Architecture](docs/architecture.md)
 - [Capture contracts](docs/capture-contracts.md)
+- [Offline inspection capture](docs/inspection-capture-v1.md)
 - [Repository relationships](docs/repository-relations.md)
 - [Security and data handling](docs/security-and-data.md)
 - [Architecture Decision Records](docs/adr/README.md)

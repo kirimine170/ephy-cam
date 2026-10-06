@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "session_id": "synthetic-session-01",
+  "task_id": "synthetic-task-01",
+  "sample_id": "synthetic-sample-01",
+  "identity_basis": "operator_assertion",
+  "design_job_ref": "synthetic-design-job-01",
+  "manufacturing_job_ref": "synthetic-manufacturing-job-01",
+  "design_revision": "synthetic-rev-01",
+  "cad_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "parameter_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "requirement_sha256": "unknown",
+  "fixture": {
+    "id": "synthetic-fixture-01",
+    "revision": "1"
+  },
+  "mount": {
+    "id": "synthetic-mount-01",
+    "revision": "1"
+  },
+  "lighting": {
+    "id": "unknown",
+    "revision": "unknown"
+  },
+  "background": {
+    "id": "unknown",
+    "revision": "unknown"
+  },
+  "calibration": {
+    "status": "unknown",
+    "reference": "unknown",
+    "revision": "unknown"
+  },
+  "capture": {
+    "capture_id": "11111111-1111-4111-8111-111111111111",
+    "source_id": "xiao-esp32s3-sense-01",
+    "image_path": "capture.jpg"
+  }
+}
