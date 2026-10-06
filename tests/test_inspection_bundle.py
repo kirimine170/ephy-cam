@@ -199,6 +199,26 @@ class InspectionBundleTests(unittest.TestCase):
         report = self.build()
         self.assertIn("capture/view/capture.jpg", [r["path"] for r in report["evidence_refs"]])
 
+    def test_reserved_metadata_case_aliases_and_directory_prefixes_reject(self):
+        names = ("media-envelope.json", "validation.json", "capture-source.json",
+                 "MEDIA-ENVELOPE.JSON", "Validation.json", "Capture-Source.Json")
+        for name in names:
+            for path in (name, name + "/capture.jpg"):
+                with self.subTest(path=path):
+                    self.session["capture"]["image_path"] = path
+                    # Reject before reading the image; never create aliased
+                    # fixture files on the Windows host running this test.
+                    self.session_path.write_bytes(canonical(self.session))
+                    self.reject("image_path_collision")
+
+    def test_nested_metadata_basename_does_not_alias_capture_root(self):
+        self.session["capture"]["image_path"] = "view/Validation.json"
+        self.envelope["staging_reference"] = "staging://{source_id}/{capture_id}/{image_path}".format(**self.session["capture"])
+        self.write_inputs()
+        report = self.build()
+        self.assertIn("capture/view/Validation.json", [r["path"] for r in report["evidence_refs"]])
+        self.assertEqual(report, replay_bundle(self.root / "bundle", expected_identity=self.expected))
+
     def test_symlink_input_file_and_parent_reject(self):
         link = self.root / "linked-source"
         try:

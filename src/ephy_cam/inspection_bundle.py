@@ -169,7 +169,10 @@ def _session(raw, expected):
     if any(session[field] != identity[field] for field in IDENTITY_FIELDS):
         raise BundleError("identity_mismatch")
     relative_path(session["capture"]["image_path"])
-    if session["capture"]["image_path"] in ("media-envelope.json", "validation.json", "capture-source.json"):
+    # The first component can alias a metadata file on Windows, including
+    # when it is used as a directory prefix in a bundle created on Linux.
+    capture_root_name = session["capture"]["image_path"].split("/", 1)[0].casefold()
+    if capture_root_name in ("media-envelope.json", "validation.json", "capture-source.json"):
         raise BundleError("image_path_collision")
     return session
 
