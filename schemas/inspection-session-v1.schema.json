@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InspectionSession v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "session_id",
+    "task_id",
+    "sample_id",
+    "identity_basis",
+    "design_job_ref",
+    "manufacturing_job_ref",
+    "design_revision",
+    "cad_sha256",
+    "parameter_sha256",
+    "requirement_sha256",
+    "fixture",
+    "mount",
+    "lighting",
+    "background",
+    "calibration",
+    "capture"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "session_id": {
+      "$ref": "#/$defs/identity"
+    },
+    "task_id": {
+      "$ref": "#/$defs/identity"
+    },
+    "sample_id": {
+      "$ref": "#/$defs/identity"
+    },
+    "identity_basis": {
+      "const": "operator_assertion"
+    },
+    "design_job_ref": {
+      "$ref": "#/$defs/token"
+    },
+    "manufacturing_job_ref": {
+      "$ref": "#/$defs/token"
+    },
+    "design_revision": {
+      "$ref": "#/$defs/token"
+    },
+    "cad_sha256": {
+      "$ref": "#/$defs/hashOrUnknown"
+    },
+    "parameter_sha256": {
+      "$ref": "#/$defs/hashOrUnknown"
+    },
+    "requirement_sha256": {
+      "$ref": "#/$defs/hashOrUnknown"
+    },
+    "fixture": {
+      "$ref": "#/$defs/setup"
+    },
+    "mount": {
+      "$ref": "#/$defs/setup"
+    },
+    "lighting": {
+      "$ref": "#/$defs/setup"
+    },
+    "background": {
+      "$ref": "#/$defs/setup"
+    },
+    "calibration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reference",
+        "revision"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "unknown",
+            "operator_declared"
+          ]
+        },
+        "reference": {
+          "$ref": "#/$defs/token"
+        },
+        "revision": {
+          "$ref": "#/$defs/token"
+        }
+      }
+    },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capture_id",
+        "source_id",
+        "image_path"
+      ],
+      "properties": {
+        "capture_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "source_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "image_path": {
+          "$ref": "#/$defs/token"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "token": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$"
+    },
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/token"
+        },
+        {
+          "not": {
+            "const": "unknown"
+          }
+        }
+      ]
+    },
+    "hashOrUnknown": {
+      "anyOf": [
+        {
+          "const": "unknown"
+        },
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      ]
+    },
+    "setup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "revision"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/token"
+        },
+        "revision": {
+          "$ref": "#/$defs/token"
+        }
+      }
+    }
+  }
+}
