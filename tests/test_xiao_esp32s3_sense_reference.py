@@ -63,6 +63,19 @@ class XiaoEsp32S3SenseReferenceTests(unittest.TestCase):
         self.assertNotIn('"media_bytes"', host)
         self.assertIn("staging root must be outside the Git repository", host)
 
+    def test_host_consumes_capture_payload_header_before_jpeg(self) -> None:
+        host = (REFERENCE / "host" / "ephy_cam_reference.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertEqual(
+            host.count('payload_marker=f"{PROTOCOL} FRAME"'),
+            2,
+        )
+        self.assertIn(
+            'ProtocolError("payload byte count differs from frame metadata")',
+            host,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

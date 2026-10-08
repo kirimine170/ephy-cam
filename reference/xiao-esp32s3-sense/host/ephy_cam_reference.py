@@ -103,6 +103,7 @@ def receive_frame(
     frame_marker: str,
     complete_marker: str,
     expected_size: tuple[int, int],
+    payload_marker: str | None = None,
 ) -> tuple[bytes, dict[str, str], dict[str, str]]:
     transport.reset_input_buffer()
     transport.write(command + b"\n")
@@ -110,8 +111,14 @@ def receive_frame(
     wait_for_line(transport, begin_marker)
     metadata_line = wait_for_line(transport, frame_marker)
     metadata = parse_fields(metadata_line)
+    payload = metadata
+    if payload_marker is not None:
+        payload_line = wait_for_line(transport, payload_marker)
+        payload = parse_fields(payload_line)
+        if payload.get("bytes") != metadata.get("bytes"):
+            raise ProtocolError("payload byte count differs from frame metadata")
     try:
-        length = int(metadata["bytes"])
+        length = int(payload["bytes"])
     except (KeyError, ValueError) as exc:
         raise ProtocolError(f"invalid frame length: {metadata_line}") from exc
     if length <= 0 or length > 10_000_000:
@@ -295,6 +302,7 @@ def serial_worker(
                             f"{PROTOCOL} CAPTURED",
                             f"{PROTOCOL} COMPLETE",
                             CAPTURE_SIZE,
+                            payload_marker=f"{PROTOCOL} FRAME",
                         )
                         ticket.result = write_capture_artifacts(
                             staging_root, schema_root, jpeg, frame, complete
@@ -436,6 +444,7 @@ def capture_command(args: argparse.Namespace) -> int:
             f"{PROTOCOL} CAPTURED",
             f"{PROTOCOL} COMPLETE",
             CAPTURE_SIZE,
+            payload_marker=f"{PROTOCOL} FRAME",
         )
     result = write_capture_artifacts(
         args.staging_root, args.schema_root, jpeg, frame, complete
